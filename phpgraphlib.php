@@ -198,6 +198,8 @@ class PHPGraphLib {
 	protected $legend_swatch_outline_color;
 	protected $legend_titles = array();
 
+	protected $ttf_font = null;
+
 	public function __construct($width, $height, $output_file = null) 
 	{
 		$this->width = $width;
@@ -454,7 +456,7 @@ class PHPGraphLib {
 					}
 					//recenter data position if necessary
 					$dataX -= ($this->data_additional_length * self::DATA_VALUE_TEXT_WIDTH) / 2;
-					imagestring($this->image, 2, $dataX, $dataY, $item,  $this->data_value_color);
+					$this->imagestring($this->image, 2, $dataX, $dataY, $item,  $this->data_value_color);
 				}
 				//write x axis value 
 				if ($this->bool_x_axis_values) {
@@ -474,11 +476,11 @@ class PHPGraphLib {
 							if ($this->x_axis_value_interval) {
 								if ($key % $this->x_axis_value_interval) {
 								} else {
-									imagestringup($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
+									$this->imagestringup($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
 								}
 							}
 							else {
-								imagestringup($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
+								$this->imagestringup($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
 							}
 						}
 						else {
@@ -498,10 +500,10 @@ class PHPGraphLib {
 							if ($this->x_axis_value_interval) {
 								if ($key % $this->x_axis_value_interval) {
 								} else {
-									imagestring($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
+									$this->imagestring($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
 								}
 							} else {
-								imagestring($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
+								$this->imagestring($this->image, 2, $textHorizPos, $textVertPos, $key,  $this->x_axis_text_color);
 							}
 						}
 					}
@@ -699,7 +701,7 @@ class PHPGraphLib {
 				if ($this->data_currency) {
 					$value = $this->applyDataCurrency($value);
 				}
-				//imagestring($this->image, 2, $adjustedXValue, $adjustedYValue, $value, $this->y_axis_text_color);
+				//$this->imagestring($this->image, 2, $adjustedXValue, $adjustedYValue, $value, $this->y_axis_text_color);
 				$this->horiz_grid_values[] = array('size' => 2, 'x' => $adjustedXValue, 'y' => $adjustedYValue,
 					'value' => $value, 'color' => $this->y_axis_text_color);
 			}
@@ -752,11 +754,11 @@ class PHPGraphLib {
 			imageline($this->image, $line['x1'], $line['y1'], $line['x2'], $line['y2'] , $line['color']);
 		}
 		foreach ($this->horiz_grid_values as $value) {
-			imagestring($this->image, $value['size'], $value['x'], $value['y'], $value['value'], $value['color']);
+			$this->imagestring($this->image, $value['size'], $value['x'], $value['y'], $value['value'], $value['color']);
 		}
 		//not implemented in the base library, but used in extensions
 		foreach ($this->vert_grid_values as $value) {
-			imagestring($this->image, $value['size'], $value['x'], $value['y'], $value['value'], $value['color']);
+			$this->imagestring($this->image, $value['size'], $value['x'], $value['y'], $value['value'], $value['color']);
 		}
 	}
 
@@ -817,7 +819,7 @@ class PHPGraphLib {
 			$this->title_x = $this->x_axis_x2 - ($titleLength * self::TITLE_CHAR_WIDTH);
 			$this->title_y = $textVertPos;
 		}
-		imagestring($this->image, 2, $title_x , $title_y , $this->title_text,  $this->title_color);
+		$this->imagestring($this->image, 2, $title_x , $title_y , $this->title_text,  $this->title_color);
 	}
 
 	protected function calcTopMargin() 
@@ -928,10 +930,10 @@ class PHPGraphLib {
 			$errorColor = imagecolorallocate($this->image, 0, 0, 0);
 			$errorBackColor = imagecolorallocate($this->image, 255, 204, 0);
 			imagefilledrectangle($this->image, 0, 0, $this->width - 1, 2 * $lineHeight,  $errorBackColor);
-			imagestring($this->image, 3, 2, 0, "!!----- PHPGraphLib Error -----!!",  $errorColor);
+			$this->imagestring($this->image, 3, 2, 0, "!!----- PHPGraphLib Error -----!!",  $errorColor);
 			foreach($this->error as $key => $errorText) {
 				imagefilledrectangle($this->image, 0, ($key * $lineHeight) + $lineHeight, $this->width - 1, ($key * $lineHeight) + 2 * $lineHeight,  $errorBackColor);	
-				imagestring($this->image, 2, 2, ($key * $lineHeight) + $lineHeight, "[". ($key + 1) . "] ". $errorText,  $errorColor);	
+				$this->imagestring($this->image, 2, 2, ($key * $lineHeight) + $lineHeight, "[". ($key + 1) . "] ". $errorText,  $errorColor);	
 			}
 			$errorOutlineColor = imagecolorallocate($this->image, 255, 0, 0);
 			imagerectangle($this->image, 0, 0, $this->width-1,($key * $lineHeight) + 2 * $lineHeight,  $errorOutlineColor);		
@@ -1608,7 +1610,7 @@ class PHPGraphLib {
 			}
 			imagefilledrectangle($this->image, $xValue, $yValue + $swatchToTextOffset, $xValue + $swatchSize, $yValue + $swatchToTextOffset + $swatchSize, $color);
 			imagerectangle($this->image, $xValue, $yValue + $swatchToTextOffset, $xValue + $swatchSize, $yValue + $swatchToTextOffset + $swatchSize, $this->legend_swatch_outline_color);	
-			imagestring($this->image, 2, $xValue + (2 * self::LEGEND_PADDING + 2), $yValue, $data_label, $this->legend_text_color);
+			$this->imagestring($this->image, 2, $xValue + (2 * self::LEGEND_PADDING + 2), $yValue, $data_label, $this->legend_text_color);
 		}
 	}
 
@@ -1619,5 +1621,34 @@ class PHPGraphLib {
 		} else { 
 			$this->error[] = "Boolean arg for setIgnoreDataFitErrors() not specified properly.";
 		}	
+	}
+
+	public function setTtfFont($font)
+	{
+		$this->ttf_font = $font;
+	}
+
+	protected function imagestring($image, $font_size, $xValue, $yValue, $text, $color, $vertical = false)
+	{
+		$correction = 10;
+
+		if ($this->ttf_font !== null) {
+			$size = $font_size + 5.5;
+			$angle = $vertical ? 90 : 0;
+			$xValue += $vertical ? $correction : 0;
+			$yValue += $vertical ? 0 : $correction;
+			return imagettftext($image, $size, $angle, $xValue, $yValue, $color, $this->ttf_font, $text) === false ? false : true;
+		}
+
+		if ($vertical) {
+			return imagestringup($image, $font_size, $xValue, $yValue, $text, $color);
+		}
+
+		return imagestring($image, $font_size, $xValue, $yValue, $text, $color);
+	}
+
+	protected function imagestringup($image, $font_size, $xValue, $yValue, $text, $color)
+	{
+		return $this->imagestring($image, $font_size, $xValue, $yValue, $text, $color, true);
 	}
 }
